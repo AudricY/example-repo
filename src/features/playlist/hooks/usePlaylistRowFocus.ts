@@ -1,36 +1,25 @@
-import { CSSProperties } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import type { Row } from "../../../data/rows";
 
 /**
- * Hook that will eventually own all row-focus concerns.
- *
- * TEMPORARY: For now, this hook does NOT own the focus state itself.
- * The component still manages focusedRowId and passes it in so that
- * existing behavior is preserved while we migrate incrementally.
- *
- * Once migration is complete, the state will move inside this hook
- * and the component will no longer need to pass focusedRowId.
+ * Owns all row-focus concerns for the playlist.
  */
-export function usePlaylistRowFocus(
-  rows: Row[],
-  /** TEMPORARY — passed in from the component to keep behavior working */
-  externalFocusedRowId: string | null,
-  /** TEMPORARY — passed in from the component to keep behavior working */
-  externalSetFocusedRowId: (id: string) => void
-) {
-  // TEMPORARY: delegate to the external state passed from the component.
-  // In the final version, state will live here instead.
-  const focusedRow = rows.find((r) => r.id === externalFocusedRowId) ?? null;
+export function usePlaylistRowFocus(rows: Row[]) {
+  const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
 
-  // TEMPORARY: wrapper that forwards to the external setter.
-  // This exists only so consumers can start calling hook.focusRow()
-  // before the hook actually owns the state.
-  const focusRow = (id: string) => externalSetFocusedRowId(id);
+  useEffect(() => {
+    if (rows.length > 0) {
+      setFocusedRowId(rows[0].id);
+    }
+  }, [rows]);
 
-  // TEMPORARY: style helper that reads from the external state.
+  const focusedRow = rows.find((r) => r.id === focusedRowId) ?? null;
+
+  const focusRow = (id: string) => setFocusedRowId(id);
+
   const rowStyle = (row: Row): CSSProperties => ({
     cursor: "pointer",
-    backgroundColor: row.id === externalFocusedRowId ? "#e0edff" : "transparent",
+    backgroundColor: row.id === focusedRowId ? "#e0edff" : "transparent",
   });
 
   return { focusedRow, focusRow, rowStyle };
