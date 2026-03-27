@@ -1,18 +1,29 @@
 import { useState, useEffect } from "react";
 import { rows } from "../../data/rows";
 import { RowDetails } from "./components/RowDetails";
+import { usePlaylistRowFocus } from "./hooks/usePlaylistRowFocus";
 
 export function Playlist() {
+  // TEMPORARY: state still lives in the component so behavior is preserved.
+  // Will be removed once the hook fully owns focus state.
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
 
   // Auto-focus first row on mount
+  // TEMPORARY: this effect will move into the hook in the next step.
   useEffect(() => {
     if (rows.length > 0) {
       setFocusedRowId(rows[0].id);
     }
   }, []);
 
-  const focusedRow = rows.find((r) => r.id === focusedRowId) ?? null;
+  // TEMPORARY: pass component-owned state into the hook as a bridge.
+  // The hook wraps the state it doesn't yet own so that callers
+  // can start using the hook API before migration is complete.
+  const { focusedRow, focusRow, rowStyle } = usePlaylistRowFocus(
+    rows,
+    focusedRowId,
+    setFocusedRowId
+  );
 
   return (
     <div>
@@ -26,14 +37,7 @@ export function Playlist() {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr
-              key={row.id}
-              onClick={() => setFocusedRowId(row.id)}
-              style={{
-                cursor: "pointer",
-                backgroundColor: row.id === focusedRowId ? "#e0edff" : "transparent",
-              }}
-            >
+            <tr key={row.id} onClick={() => focusRow(row.id)} style={rowStyle(row)}>
               <td style={{ padding: "6px 12px" }}>{row.title}</td>
               <td style={{ padding: "6px 12px" }}>{row.artist}</td>
               <td style={{ padding: "6px 12px", textAlign: "right" }}>{row.duration}</td>
