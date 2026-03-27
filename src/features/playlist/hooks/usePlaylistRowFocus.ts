@@ -1,31 +1,25 @@
-import { CSSProperties } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import type { Row } from "../../../data/rows";
 
 /**
- * Will own all row-focus concerns for the playlist.
- *
- * Not yet wired in — Playlist.tsx still uses inline logic.
- * This file exists to show the intended hook shape so reviewers
- * can see where the logic is headed.
- *
- * API:
- *   focusedRow  – the currently focused Row or null
- *   focusRow    – callback to focus a row by id
- *   rowStyle    – returns highlight styles for a given row
+ * Owns all row-focus concerns for the playlist.
  */
-export function usePlaylistRowFocus(_rows: Row[]) {
-  // TODO: focused row state (useState)
-  // TODO: auto-focus first row on mount (useEffect)
+export function usePlaylistRowFocus(rows: Row[]) {
+  const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
 
-  const focusedRow: Row | null = null; // TODO: derive from state
+  useEffect(() => {
+    if (rows.length > 0) {
+      setFocusedRowId(rows[0].id);
+    }
+  }, [rows]);
 
-  const focusRow = (_id: string) => {
-    // TODO: update focused row state
-  };
+  const focusedRow = rows.find((r) => r.id === focusedRowId) ?? null;
 
-  const rowStyle = (_row: Row): CSSProperties => ({
+  const focusRow = (id: string) => setFocusedRowId(id);
+
+  const rowStyle = (row: Row): CSSProperties => ({
     cursor: "pointer",
-    // TODO: highlight when row.id matches focused row
+    backgroundColor: row.id === focusedRowId ? "#e0edff" : "transparent",
   });
 
   return { focusedRow, focusRow, rowStyle };
