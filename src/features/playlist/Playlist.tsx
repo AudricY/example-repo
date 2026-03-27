@@ -3,15 +3,17 @@ import { rows } from "../../data/rows";
 import { RowDetails } from "./components/RowDetails";
 
 export function Playlist() {
+  // WILL BE REMOVED — moves to usePlaylistRowFocus
   const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
 
-  // Auto-focus first row on mount
+  // WILL BE REMOVED — moves to usePlaylistRowFocus
   useEffect(() => {
     if (rows.length > 0) {
       setFocusedRowId(rows[0].id);
     }
   }, []);
 
+  // WILL BE REMOVED — replaced by hook's focusedRow
   const focusedRow = rows.find((r) => r.id === focusedRowId) ?? null;
 
   return (
@@ -28,9 +30,11 @@ export function Playlist() {
           {rows.map((row) => (
             <tr
               key={row.id}
+              // WILL BE REMOVED — replaced by hook's focusRow
               onClick={() => setFocusedRowId(row.id)}
               style={{
                 cursor: "pointer",
+                // WILL BE REMOVED — replaced by hook's rowStyle
                 backgroundColor: row.id === focusedRowId ? "#e0edff" : "transparent",
               }}
             >
